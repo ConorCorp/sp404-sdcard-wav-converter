@@ -47,6 +47,8 @@ Found 4771 WAV file(s). Checking compatibility...
 
 **USE AT YOUR OWN RISK.** This tool modifies files directly on your SD card, replacing them. The author is not responsible for any data loss, corruption, or damage to your files or equipment. Always keep backups of your samples off of the sp404.
 
+You should keep copies of the samples off of the sd card any converted files will drop in quality to become 16 bit.
+
 ## Requirements
 
 - **macOS only**
