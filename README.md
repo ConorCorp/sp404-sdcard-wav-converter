@@ -79,7 +79,7 @@ sp404-convert
 4. Review the incompatible files found
 5. Confirm to convert
 
-The tool will convert files to 16-bit PCM WAV in place. **Original files are replaced/deleted.**
+The tool will convert files which aren't 8 or 16 bit wavs to 16-bit PCM WAV in place. **Original files are replaced/deleted.**
 
 ### Test Mode
 
