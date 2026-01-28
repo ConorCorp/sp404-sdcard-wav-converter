@@ -1,6 +1,6 @@
 # SP-404 MK2 WAV Converter
 
-A CLI tool that fixes all wavs on your sp404 mk2 formatted sd card in one command! 🏎️
+A nodejs/macos CLI tool that fixes all wavs on your sp404 mk2 formatted sd card in one command! 🏎️
 
 The SP-404 MK2 doesn't support 24-bit (sometimes?) or 32-bit WAV files. This tool scans your SD card's IMPORT folder, identifies incompatible wav files (non 8 or 16 bit files), and converts them in place.
 
