@@ -89,7 +89,7 @@ async function convertToSp404Format(filePath: string): Promise<boolean> {
   const tempPath = filePath.replace(/\.wav$/i, "_temp.wav");
   try {
     await execAsync(
-      `ffmpeg -y -i "${filePath}" -acodec pcm_s16le "${tempPath}"`
+      `ffmpeg -y -i "${filePath}" -af "aresample=dither_method=triangular_hp" -acodec pcm_s16le "${tempPath}"`
     );
     fs.unlinkSync(filePath);
     fs.renameSync(tempPath, filePath);
