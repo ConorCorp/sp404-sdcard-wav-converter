@@ -45,9 +45,9 @@ Found 4771 WAV file(s). Checking compatibility...
 
 ## Disclaimer
 
-**USE AT YOUR OWN RISK.** This tool modifies files directly on your SD card, replacing them. The author is not responsible for any data loss, corruption, or damage to your files or equipment. Always keep backups of your samples off of the sp404.
+**USE AT YOUR OWN RISK.** This tool modifies files directly on your SD card, replacing them. The author is not responsible for any data loss, corruption, or damage to your files or equipment. Always keep backups of your samples off of the your sd card before running.
 
-You should keep copies of the samples off of the sd card any converted files will drop in quality to become 16 bit.
+**You should keep copies of the samples off of the sd card**, any converted files will drop in quality to become 16 bit.
 
 ## Requirements
 
@@ -64,17 +64,20 @@ npm i
 
 Running:
 ```bash
-npx sp404-sdcard-wav-converter
+npm run dev
 
 # or install globally on system
+npm run build
 npm i -g
 
+# Now you can run this anywhere
 sp404-convert
 ```
 
 
 ## Usage
 
+0. Make sure you have your samples backed up off your sd card.
 1. Insert your [SP-404 MK2 formatted SD card](https://support.roland.com/hc/en-us/articles/24692189759899-SP-404MK2-Formatting-an-SD-Card)
 2. Run `sp404-convert` (or `npx sp404-sdcard-wav-converter`)
 3. Select your SD card from the list
@@ -89,6 +92,28 @@ Run with `--test` or `-t` to only process a single file (useful for a safe test 
 
 ```bash
 sp404-convert --test
+```
+
+### Ignore list
+You can add folders to ignore this process for. This is especially useful for samples you know are over 16 bit but work in the sp404 for some reason. If NearTao can't figure out what this device supports besides 16 bit, there's no hope for any of us.
+
+To use it, just add folders to the [ignore.json](./ignore.json) with their imports relative to the IMPORT folder in your sp404.
+
+#### Example:
+
+Folders:
+```
+  drums/ -> Ignore
+  drums2/
+    BASEMENT DRUMS VOL 2/  -> Ignore
+     sample.mp3
+    SOME_32_BIT_SAMPLES/
+```
+ignore.txt
+```json
+{
+  "foldersInIMPORTToIgnore": ["drums", "drums2/BASEMENT DRUMS VOL 2"]
+}
 ```
 
 

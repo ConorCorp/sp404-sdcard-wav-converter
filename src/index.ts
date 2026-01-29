@@ -4,8 +4,25 @@ import { execSync, exec } from "child_process";
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const execAsync = promisify(exec);
+
+interface IgnoreConfig {
+  foldersInIMPORTToIgnore: string[];
+}
+
+function loadIgnoreConfig(): IgnoreConfig {
+  const configPath = path.join(__dirname, "..", "ignore.json");
+  try {
+    const content = fs.readFileSync(configPath, "utf-8");
+    return JSON.parse(content);
+  } catch {
+    return { foldersInIMPORTToIgnore: [] };
+  }
+}
 const testMode = process.argv.includes("--test") || process.argv.includes("-t");
 
 interface ExternalDrive {
@@ -101,15 +118,24 @@ async function convertToSp404Format(filePath: string): Promise<boolean> {
   }
 }
 
-function findWavFiles(dir: string): string[] {
+function findWavFiles(
+  currentDir: string,
+  importFolder: string,
+  ignoreFolders: string[]
+): string[] {
   const wavFiles: string[] = [];
-  if (!fs.existsSync(dir)) return wavFiles;
+  if (!fs.existsSync(currentDir)) return wavFiles;
 
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const entries = fs.readdirSync(currentDir, { withFileTypes: true });
   for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
+    const fullPath = path.join(currentDir, entry.name);
     if (entry.isDirectory()) {
-      wavFiles.push(...findWavFiles(fullPath));
+      // Check if this folder matches any ignore pattern (supports nested paths like "folder2/subfolder")
+      const relPath = path.relative(importFolder, fullPath);
+      if (ignoreFolders.includes(relPath)) {
+        continue;
+      }
+      wavFiles.push(...findWavFiles(fullPath, importFolder, ignoreFolders));
     } else if (
       entry.isFile() &&
       /\.wav$/i.test(entry.name) &&
@@ -154,9 +180,33 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`\n📂 Scanning ${importFolder} for WAV files...\n`);
+  const ignoreConfig = loadIgnoreConfig();
+  if (ignoreConfig.foldersInIMPORTToIgnore.length > 0) {
+    console.log(
+      `\n📋 Ignoring folders:\n ${ignoreConfig.foldersInIMPORTToIgnore.join(
+        ", "
+      )}\n`
+    );
+  } else {
+    console.log("📋 No folders in ignore list.\n");
+  }
 
-  const wavFiles = findWavFiles(importFolder);
+  const proceed = await confirm({
+    message: "Scan for unsupported WAV files? (Nothing will be changed yet.)",
+    default: true,
+  });
+  if (!proceed) {
+    console.log("Cancelled.");
+    return;
+  }
+
+  console.log(`📂 Scanning ${importFolder} for WAV files...\n`);
+
+  const wavFiles = findWavFiles(
+    importFolder,
+    importFolder,
+    ignoreConfig.foldersInIMPORTToIgnore
+  );
   if (wavFiles.length === 0) {
     console.log("✅ No WAV files found in IMPORT folder.");
     return;
@@ -187,12 +237,12 @@ async function main() {
 
   console.log(`\n${incompatible.length} file(s) need conversion to 16-bit.\n`);
 
-  const proceed = await confirm({
+  const proceed1 = await confirm({
     message: "Convert these files? (Warning: Original files will be deleted)",
     default: true,
   });
 
-  if (!proceed) {
+  if (!proceed1) {
     console.log("Cancelled.");
     return;
   }
