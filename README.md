@@ -109,7 +109,7 @@ Folders:
      sample.mp3
     SOME_32_BIT_SAMPLES/
 ```
-ignore.txt
+ignore.json
 ```json
 {
   "foldersInIMPORTToIgnore": ["drums", "drums2/BASEMENT DRUMS VOL 2"]
